@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEW STARS | Scout Cloud 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37; --dark: #050505; --card: #111111;
+            --border: rgba(212, 175, 55, 0.2); --success: #00ff88; --danger: #ff4d4d;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--dark); color: white; padding-bottom: 50px; }
+        
+        header { padding: 20px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .container { max-width: 600px; margin: auto; padding: 20px; }
+        
+        .btn-main { background: var(--gold); color: black; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; }
+        .btn-view { background: white; color: black; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-bottom: 20px; font-size: 1rem; }
+        .btn-danger { background: rgba(255, 77, 77, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 10px; border-radius: 10px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 30px; font-size: 0.7rem; }
+
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; background: #000; border: 1px solid #333; color: white; outline: none; }
+        label { display: block; font-size: 0.75rem; font-weight: 800; color: var(--gold); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        #searchInput { width: 100%; padding: 18px; border-radius: 15px; background: var(--card); border: 1px solid var(--gold); color: white; text-align: center; outline: none; margin: 20px 0; font-size: 1.1rem; }
+        .search-results { background: var(--card); border-radius: 15px; border: 1px solid var(--border); display: none; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .result-item { padding: 18px; border-bottom: 1px solid var(--glass); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+
+        .player-profile { display: none; background: var(--card); border-radius: 25px; border: 1px solid var(--border); padding: 25px; margin-top: 10px; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.98); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card); padding: 30px; border-radius: 25px; width: 95%; max-width: 500px; border: 1px solid var(--gold); position: relative; }
+        
+        .full-stat-row { background: var(--glass); padding: 15px; border-radius: 15px; margin-bottom: 12px; border-left: 4px solid var(--gold); }
+        .stat-summary-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .sum-card { flex: 1; background: #000; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-weight: 800; color: var(--gold); letter-spacing: 1px;">NEW STARS PRO</div>
+        <button class="btn-main" style="width: auto;" onclick="openModal('regModal')">+ LOJTAR</button>
+    </header>
+
+    <div class="container">
+        <input type="text" id="searchInput" placeholder="Shkruaj emrin e lojtarit..." onkeyup="searchPlayer()">
+        <div id="searchResults" class="search-results"></div>
+
+        <div id="playerProfile" class="player-profile">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 id="viewName" style="text-transform: uppercase; font-weight: 800;">---</h2>
+                <button onclick="closeProfile()" style="color: #555; background: none; border: none; cursor: pointer; font-weight: 800;">MBYLL</button>
+            </div>
+
+            <button class="btn-view" onclick="openFullStats()">📊 SHIKO STATISTIKAT E PLOTA</button>
+            
+            <div style="background: rgba(212,175,55,0.03); padding: 20px; border-radius: 20px; border: 1px solid var(--border);">
+                <h4 style="margin-bottom: 20px; font-size: 0.8rem; color: var(--gold); text-align: center; letter-spacing: 1px;">SHTO TË DHËNAT E NDESHJES</h4>
+                
+                <label>Sezoni (p.sh 2025/26)</label>
+                <input type="text" id="season" placeholder="Shkruaj sezonin...">
+
+                <label>Kundërshtari</label>
+                <input type="text" id="opponent" placeholder="Emri i ekipit tjetër">
+
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex:1;"><label>Xhiro</label><input type="text" id="round" placeholder="Nr."></div>
+                    <div style="flex:1;"><label>Gola</label><input type="number" id="goals" value="0"></div>
+                    <div style="flex:1;"><label>Asiste</label><input type="number" id="assists" value="0"></div>
+                </div>
+
+                <label>Data e Ndeshjes</label>
+                <input type="date" id="matchDate">
+
+                <button class="btn-main" onclick="saveStat()">NGARKO STATISTIKAT</button>
+            </div>
+
+            <button class="btn-danger" onclick="deletePlayer()">FSHIJ LOJTARIN NGA SISTEMI</button>
+        </div>
+    </div>
+
+    <div id="fullStatsModal" class="modal">
+        <div class="modal-content">
+            <h2 id="statsTitle" style="color: var(--gold); text-transform: uppercase;">---</h2>
+            <p id="statsSub" style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 20px;"></p>
+            
+            <div class="stat-summary-box">
+                <div class="sum-card"><small style="opacity:0.5; font-size:0.6rem;">GOLA TOTAL</small><h2 id="fGoals" style="color:var(--success)">0</h2></div>
+                <div class="sum-card"><small style="opacity:0.5; font-size:0.6rem;">ASISTE TOTAL</small><h2 id="fAssists" style="color:var(--gold)">0</h2></div>
+            </div>
+
+            <div id="fullHistoryList" style="max-height: 350px; overflow-y: auto; padding-right: 5px;"></div>
+            
+            <button class="btn-main" style="margin-top: 20px; background: white;" onclick="closeModal('fullStatsModal')">MBYLL RAPORTIN</button>
+        </div>
+    </div>
+
+    <div id="regModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px; color: var(--gold);">Regjistro Lojtar</h2>
+            <label>Emri dhe Mbiemri</label>
+            <input type="text" id="regName" placeholder="P.sh. Filan Fisteku">
+            <label>Grupmosha</label>
+            <input type="text" id="regCategory" placeholder="P.sh. U15">
+            <button class="btn-main" onclick="saveNewPlayer()">RUAJ LOJTARIN</button>
+            <p onclick="closeModal('regModal')" style="text-align: center; margin-top: 15px; cursor: pointer; opacity: 0.5; font-size: 0.8rem;">Anulo</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBh_7bwfNbKbscPSW1ZN9Y_UvAntsjl9Wg",
+            authDomain: "herolind-6ca5f.firebaseapp.com",
+            projectId: "herolind-6ca5f",
+            storageBucket: "herolind-6ca5f.firebasestorage.app",
+            messagingSenderId: "893085364638",
+            appId: "1:893085364638:web:2db59e6ec72ad7e7c1a68f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const playersRef = collection(db, "players_manual_v5");
+
+        let allPlayers = [];
+        let currentPlayerId = null;
+        let currentStats = [];
+
+        onSnapshot(playersRef, (snapshot) => {
+            allPlayers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        });
+
+        window.saveNewPlayer = async () => {
+            const name = document.getElementById('regName').value;
+            const cat = document.getElementById('regCategory').value;
+            if(!name || !cat) { alert("Shkruaj emrin dhe kategorinë!"); return; }
+            await addDoc(playersRef, { name, category: cat });
+            closeModal('regModal');
+            document.getElementById('regName').value = "";
+            document.getElementById('regCategory').value = "";
+        };
+
+        window.searchPlayer = () => {
+            const val = document.getElementById('searchInput').value.toLowerCase();
+            const resDiv = document.getElementById('searchResults');
+            if(val.length < 1) { resDiv.style.display = 'none'; return; }
+            const filtered = allPlayers.filter(p => p.name.toLowerCase().includes(val));
+            resDiv.innerHTML = filtered.map(p => `<div class="result-item" onclick="openProfile('${p.id}')"><span>${p.name}</span><b style="color:var(--gold); font-size:0.7rem;">${p.category}</b></div>`).join('');
+            resDiv.style.display = 'block';
+        };
+
+        window.openProfile = (id) => {
+            currentPlayerId = id;
+            const p = allPlayers.find(x => x.id === id);
+            document.getElementById('viewName').innerText = p.name;
+            document.getElementById('playerProfile').style.display = 'block';
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('searchInput').value = "";
+            loadStats(id);
+        };
+
+        function loadStats(playerId) {
+            const q = query(collection(db, "stats_manual_v5"), where("playerId", "==", playerId), orderBy("date", "desc"));
+            onSnapshot(q, (snapshot) => {
+                currentStats = snapshot.docs.map(doc => doc.data());
+            });
+        }
+
+        window.saveStat = async () => {
+            const sea = document.getElementById('season').value;
+            const opp = document.getElementById('opponent').value;
+            const rnd = document.getElementById('round').value;
+            const dt = document.getElementById('matchDate').value;
+            if(!sea || !opp || !rnd || !dt) { alert("Plotëso të gjitha fushat me dorë!"); return; }
+
+            await addDoc(collection(db, "stats_manual_v5"), {
+                playerId: currentPlayerId,
+                opponent: opp,
+                round: rnd,
+                goals: parseInt(document.getElementById('goals').value) || 0,
+                assists: parseInt(document.getElementById('assists').value) || 0,
+                date: dt,
+                season: sea
+            });
+            alert("Statistikat u ruajtën me sukses!");
+            document.getElementById('opponent').value = "";
+            document.getElementById('round').value = "";
+        };
+
+        window.openFullStats = () => {
+            const p = allPlayers.find(x => x.id === currentPlayerId);
+            document.getElementById('statsTitle').innerText = p.name;
+            document.getElementById('statsSub').innerText = "Kategoria: " + p.category;
+            
+            let totalG = 0; let totalA = 0;
+            document.getElementById('fullHistoryList').innerHTML = currentStats.map(s => {
+                totalG += s.goals; totalA += s.assists;
+                return `
+                <div class="full-stat-row">
+                    <div style="font-size:0.65rem; opacity:0.6; display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span>XHIRO ${s.round} | SEZONI: ${s.season}</span>
+                        <span>${s.date}</span>
+                    </div>
+                    <div style="font-weight:800; margin-bottom:5px; font-size:0.9rem;">KUNDËR: ${s.opponent}</div>
+                    <div style="color:var(--success); font-weight:800;">⚽ ${s.goals} GOLA | <span style="color:var(--gold)">👟 ${s.assists} ASISTE</span></div>
+                </div>`;
+            }).join('');
+            
+            document.getElementById('fGoals').innerText = totalG;
+            document.getElementById('fAssists').innerText = totalA;
+            openModal('fullStatsModal');
+        };
+
+        window.deletePlayer = async () => {
+            if(confirm("KUJDES: A jeni i sigurt që dëshironi ta fshini lojtarin dhe historikun e tij?")) {
+                await deleteDoc(doc(db, "players_manual_v5", currentPlayerId));
+                closeProfile();
+            }
+        };
+
+        window.openModal = (id) => document.getElementById(id).style.display = 'flex';
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        window.closeProfile = () => { document.getElementById('playerProfile').style.display = 'none'; currentPlayerId = null; };
+    </script>
+</body>
+</html>
