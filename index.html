@@ -14,13 +14,13 @@
         :root {
             --primary: #004499; --primary-light: #005bc4; --accent: #ffdd00; 
             --bg-body: #f0f4f8; --bg-card: #ffffff; --text-dark: #1a1f36;
-            --text-muted: #697386; --input-bg: #f3f6f9; --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --input-bg: #f3f6f9; --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1);
             --radius-md: 12px; --radius-lg: 20px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg-body); color: var(--text-dark); padding: 15px; }
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary) 0%, #002244 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .login-box { background: white; padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); text-align: center; width: 90%; max-width: 400px; }
+        .login-box { background: white; padding: 40px; border-radius: var(--radius-lg); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); text-align: center; width: 90%; max-width: 400px; }
         #appContent { display: none; max-width: 1200px; margin: 0 auto; }
         .app-header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; padding: 20px; border-radius: var(--radius-lg); text-align: center; margin-bottom: 20px; cursor: pointer; }
         .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; overflow-x: auto; padding-bottom: 5px; }
@@ -33,9 +33,8 @@
         .btn-submit { background: var(--primary); color: white; border: none; padding: 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; width: 100%; }
         .modern-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
         .modern-table th, .modern-table td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; font-size: 0.85rem; }
-        .total-box { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; }
         .win { color: #10b981; font-weight: 800; } .draw { color: #f59e0b; font-weight: 800; } .loss { color: #ef4444; font-weight: 800; }
-        .loading-spinner { display: none; color: var(--primary); font-weight: 600; margin-bottom: 10px; }
+        .total-box { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; }
     </style>
 </head>
 <body>
@@ -71,15 +70,15 @@
                 <label>Zgjidh Lojtarin</label>
                 <select id="selLojtari"></select>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div><label>Kategoria</label><select id="lKat"><option>U9</option><option>U11</option><option>U13</option><option>U15</option><option>U17</option><option>U19</option></select></div>
+                    <div><label>Kategoria</label><select id="lKat"><option value="">Zgjidh</option><option>U9</option><option>U11</option><option>U13</option><option>U15</option><option>U17</option><option>U19</option></select></div>
                     <div><label>Sezoni</label><select id="lSez" class="sezoni-select"></select></div>
                 </div>
                 <label>Kundërshtari</label>
-                <input type="text" id="lKun" placeholder="KF Prishtina...">
+                <input type="text" id="lKun" placeholder="p.sh. KF Prishtina">
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                    <div><label>Golla</label><input type="number" id="lG" value="0"></div>
-                    <div><label>Asistime</label><input type="number" id="lA" value="0"></div>
-                    <div><label>Minuta</label><input type="number" id="lM" value="0"></div>
+                    <div><label>Golla</label><input type="number" id="lG" placeholder="0"></div>
+                    <div><label>Asistime</label><input type="number" id="lA" placeholder="0"></div>
+                    <div><label>Minuta</label><input type="number" id="lM" placeholder="0"></div>
                 </div>
                 <button class="btn-submit" style="background:#10b981;" onclick="ruajStatLojtari()">RUAJ STATISTIKAT</button>
             </div>
@@ -94,15 +93,16 @@
         <div class="stat-card">
             <h3><i class="fas fa-trophy"></i> Regjistro Ndeshjen e Shkollës</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div><label>Kategoria</label><select id="kKat"><option>U9</option><option>U11</option><option>U13</option><option>U15</option><option>U17</option><option>U19</option></select></div>
+                <div><label>Kategoria</label><select id="kKat"><option value="">Zgjidh</option><option>U9</option><option>U11</option><option>U13</option><option>U15</option><option>U17</option><option>U19</option></select></div>
                 <div><label>Sezoni</label><select id="kSez" class="sezoni-select"></select></div>
             </div>
             <label>Data</label>
             <input type="date" id="kData">
             <label>Kundërshtari</label>
-            <input type="text" id="kKun" placeholder="KF Prishtina">
+            <input type="text" id="kKun" placeholder="p.sh. KF Lepenci">
             <label>Rezultati (New Stars)</label>
             <select id="kRez">
+                <option value="">Zgjidh rezultatin</option>
                 <option value="Fitore">Fitore</option>
                 <option value="Barazim">Barazim</option>
                 <option value="Humbje">Humbje</option>
@@ -118,13 +118,11 @@
                 <div><label>Kategoria</label><select id="fKat" onchange="shfaqStatsKlubi()"><option value="Gjitha">Të gjitha</option><option>U9</option><option>U11</option><option>U13</option><option>U15</option><option>U17</option><option>U19</option></select></div>
                 <div><label>Sezoni</label><select id="fSez" class="sezoni-select" onchange="shfaqStatsKlubi()"></select></div>
             </div>
-            
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top:20px; text-align:center;">
                 <div style="background:#dcfce7; padding:15px; border-radius:10px;"><small>Fitore</small><h2 id="totalF" class="win">0</h2></div>
                 <div style="background:#fef3c7; padding:15px; border-radius:10px;"><small>Barazim</small><h2 id="totalB" class="draw">0</h2></div>
                 <div style="background:#fee2e2; padding:15px; border-radius:10px;"><small>Humbje</small><h2 id="totalH" class="loss">0</h2></div>
             </div>
-
             <table class="modern-table">
                 <thead><tr><th>Data</th><th>Kat.</th><th>Kundërshtari</th><th>Rezultati</th><th>Fshi</th></tr></thead>
                 <tbody id="listaNdeshjeveKlubi"></tbody>
@@ -145,7 +143,6 @@
                 <div class="total-box" style="background:#005bc4;"><small>Asistime</small><h2 id="pTotalA">0</h2></div>
                 <div class="total-box" style="background:#007bff;"><small>Minuta</small><h2 id="pTotalM">0</h2></div>
             </div>
-            <h3>Historiku i Ndeshjeve</h3>
             <table class="modern-table">
                 <thead><tr><th>Data</th><th>Kat.</th><th>Ndeshja</th><th>G</th><th>A</th><th>Min</th><th>Fshi</th></tr></thead>
                 <tbody id="pHistory"></tbody>
@@ -155,7 +152,6 @@
 </div>
 
 <script>
-    // Konfigurimi i Firebase që dërgove
     const firebaseConfig = {
         apiKey: "AIzaSyBh_7bwfNbKbscPSW1ZN9Y_UvAntsjl9Wg",
         authDomain: "herolind-6ca5f.firebaseapp.com",
@@ -166,7 +162,6 @@
         appId: "1:893085364638:web:2db59e6ec72ad7e7c1a68f"
     };
 
-    // Inicializimi
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -184,17 +179,15 @@
     }
 
     function initApp() {
-        // Sezonet
         const selectsSezoni = document.querySelectorAll('.sezoni-select');
-        let sezoneHTML = "";
-        for (let vit = 2024; vit <= 2030; vit++) {
+        let sezoneHTML = '<option value="">Zgjidh Sezonin</option>';
+        for (let vit = 2024; vit <= 2070; vit++) {
             let sez = `${vit}/${vit + 1}`;
             sezoneHTML += `<option value="${sez}">${sez}</option>`;
         }
         selectsSezoni.forEach(sel => sel.innerHTML = sezoneHTML);
         document.getElementById('kData').valueAsDate = new Date();
 
-        // Leximi i të dhënave nga Firebase në kohë reale
         db.ref('lojtaret').on('value', snapshot => {
             lojtaret = [];
             snapshot.forEach(child => { lojtaret.push({id: child.key, ...child.val()}); });
@@ -214,10 +207,9 @@
         });
     }
 
-    // --- FUNKSIONET E LOJTAREVE ---
     function regjistroLojtar() {
         let e = document.getElementById('regEmri').value.trim();
-        if(!e) return;
+        if(!e) return alert("Gabim: Shënoni emrin e lojtarit!");
         db.ref('lojtaret').push({ emri: e });
         document.getElementById('regEmri').value = "";
     }
@@ -234,24 +226,47 @@
     }
 
     function ruajStatLojtari() {
+        let emri = document.getElementById('selLojtari').value;
+        let kat = document.getElementById('lKat').value;
+        let sez = document.getElementById('lSez').value;
+        let kun = document.getElementById('lKun').value.trim();
+        let g = document.getElementById('lG').value;
+        let a = document.getElementById('lA').value;
+        let m = document.getElementById('lM').value;
+        
+        // KONTROLLI I RREPTË: Të gjitha fushat duhet të jenë të plotësuara
+        if(!emri || !kat || !sez || !kun || g === "" || a === "" || m === "") {
+            return alert("KUJDES: Duhet të plotësoni çdo rubrikë!\n\n(Nëse nuk ka bërë gola/asistime, shënoni numrin 0)");
+        }
+
         let st = {
-            emri: document.getElementById('selLojtari').value,
-            kat: document.getElementById('lKat').value,
-            sez: document.getElementById('lSez').value,
-            kun: document.getElementById('lKun').value,
-            g: parseInt(document.getElementById('lG').value) || 0,
-            a: parseInt(document.getElementById('lA').value) || 0,
-            m: parseInt(document.getElementById('lM').value) || 0,
+            emri: emri, kat: kat, sez: sez, kun: kun,
+            g: parseInt(g), a: parseInt(a), m: parseInt(m),
             data: new Date().toLocaleDateString('sq-AL')
         };
-        if(!st.emri || !st.kun) return alert("Plotëso fushat!");
+
         db.ref('ndeshjetLojtareve').push(st);
         alert("Statistikat u ruajtën!");
         document.getElementById('lKun').value = "";
-        document.getElementById('lG').value = 0; document.getElementById('lA').value = 0; document.getElementById('lM').value = 0;
+        document.getElementById('lG').value = ""; document.getElementById('lA').value = ""; document.getElementById('lM').value = "";
     }
 
-    // --- PROFILI DHE FILTRIMI ---
+    function ruajNdeshjeKlubi() {
+        let kat = document.getElementById('kKat').value;
+        let sez = document.getElementById('kSez').value;
+        let data = document.getElementById('kData').value;
+        let kun = document.getElementById('kKun').value.trim();
+        let rez = document.getElementById('kRez').value;
+
+        if(!kat || !sez || !data || !kun || !rez) {
+            return alert("GABIM: Plotësoni të gjitha rubrikat e ndeshjes (Kategorinë, Sezonin, Datën, Kundërshtarin dhe Rezultatin)!");
+        }
+
+        db.ref('ndeshjetKlubit').push({ kat, sez, data, kun, rez });
+        alert("Ndeshja e shkollës u regjistrua!");
+        document.getElementById('kKun').value = "";
+    }
+
     function hapProfilin(emri) {
         lojtariAktual = emri;
         document.getElementById('tabLojtaret').style.display = "none";
@@ -283,21 +298,6 @@
         document.getElementById('tabLojtaret').style.display = "block";
     }
 
-    // --- NDESHJET E KLUBIT ---
-    function ruajNdeshjeKlubi() {
-        let nd = {
-            kat: document.getElementById('kKat').value,
-            sez: document.getElementById('kSez').value,
-            data: document.getElementById('kData').value,
-            kun: document.getElementById('kKun').value,
-            rez: document.getElementById('kRez').value
-        };
-        if(!nd.kun || !nd.data) return alert("Plotëso të dhënat!");
-        db.ref('ndeshjetKlubit').push(nd);
-        alert("Ndeshja u regjistrua!");
-        document.getElementById('kKun').value = "";
-    }
-
     function shfaqStatsKlubi() {
         const kat = document.getElementById('fKat').value;
         const sez = document.getElementById('fSez').value;
@@ -315,13 +315,11 @@
         document.getElementById('totalH').innerText = h;
     }
 
-    // --- FSHIRJA DHE NAVIGIMI ---
     function fshijNdeshjeKlubi(id) { if(confirm("Fshij ndeshjen?")) db.ref('ndeshjetKlubit').child(id).remove(); }
     function fshijStatLojtari(id) { if(confirm("Fshij statistikën?")) db.ref('ndeshjetLojtareve').child(id).remove(); }
     function fshijLojtar(id, emri) {
-        if(confirm(`A jeni i sigurt? Duke fshirë lojtarin ${emri}, do të fshihen edhe të gjitha statistikat e tij.`)) {
+        if(confirm(`Sigurt? Do të fshihen edhe të gjitha statistikat për ${emri}.`)) {
             db.ref('lojtaret').child(id).remove();
-            // Fshi edhe statistikat e tij
             ndeshjetLojtareve.filter(n => n.emri === emri).forEach(n => db.ref('ndeshjetLojtareve').child(n.id).remove());
         }
     }
@@ -330,7 +328,7 @@
         document.querySelectorAll('.tab-content').forEach(t => t.style.display = "none");
         document.getElementById(id).style.display = "block";
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+        if(event) event.currentTarget.classList.add('active');
     }
 
     function kerkoLojtarin() {
