@@ -6,6 +6,10 @@
     <title>NEW STARS - Pro Stats Kit</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --primary: #004499; --primary-light: #005bc4; --accent: #ffdd00; 
@@ -31,6 +35,7 @@
         .modern-table th, .modern-table td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; font-size: 0.85rem; }
         .total-box { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; }
         .win { color: #10b981; font-weight: 800; } .draw { color: #f59e0b; font-weight: 800; } .loss { color: #ef4444; font-weight: 800; }
+        .loading-spinner { display: none; color: var(--primary); font-weight: 600; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -133,16 +138,13 @@
                 <h2 id="pEmri" style="color:var(--primary)"></h2>
                 <button onclick="mbyllProfilin()" style="padding:10px 20px; border-radius:10px; border:none; background:#eee; cursor:pointer;">Kthehu</button>
             </div>
-
             <label>Filtro sipas Sezonit</label>
             <select id="pSezFiltri" class="sezoni-select" onchange="filtroProfilin()"></select>
-
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top:10px; margin-bottom:20px;">
                 <div class="total-box"><small>Golla</small><h2 id="pTotalG">0</h2></div>
                 <div class="total-box" style="background:#005bc4;"><small>Asistime</small><h2 id="pTotalA">0</h2></div>
                 <div class="total-box" style="background:#007bff;"><small>Minuta</small><h2 id="pTotalM">0</h2></div>
             </div>
-
             <h3>Historiku i Ndeshjeve</h3>
             <table class="modern-table">
                 <thead><tr><th>Data</th><th>Kat.</th><th>Ndeshja</th><th>G</th><th>A</th><th>Min</th><th>Fshi</th></tr></thead>
@@ -153,9 +155,24 @@
 </div>
 
 <script>
-    let lojtaret = JSON.parse(localStorage.getItem('ns_players_v10')) || [];
-    let ndeshjetLojtareve = JSON.parse(localStorage.getItem('ns_stats_v10')) || [];
-    let ndeshjetKlubit = JSON.parse(localStorage.getItem('ns_club_v10')) || [];
+    // Konfigurimi i Firebase që dërgove
+    const firebaseConfig = {
+        apiKey: "AIzaSyBh_7bwfNbKbscPSW1ZN9Y_UvAntsjl9Wg",
+        authDomain: "herolind-6ca5f.firebaseapp.com",
+        databaseURL: "https://herolind-6ca5f-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "herolind-6ca5f",
+        storageBucket: "herolind-6ca5f.firebasestorage.app",
+        messagingSenderId: "893085364638",
+        appId: "1:893085364638:web:2db59e6ec72ad7e7c1a68f"
+    };
+
+    // Inicializimi
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let lojtaret = [];
+    let ndeshjetLojtareve = [];
+    let ndeshjetKlubit = [];
     let lojtariAktual = "";
 
     function checkLogin() {
@@ -167,32 +184,42 @@
     }
 
     function initApp() {
+        // Sezonet
         const selectsSezoni = document.querySelectorAll('.sezoni-select');
         let sezoneHTML = "";
-        for (let vit = 2024; vit <= 2100; vit++) {
+        for (let vit = 2024; vit <= 2030; vit++) {
             let sez = `${vit}/${vit + 1}`;
             sezoneHTML += `<option value="${sez}">${sez}</option>`;
         }
         selectsSezoni.forEach(sel => sel.innerHTML = sezoneHTML);
         document.getElementById('kData').valueAsDate = new Date();
-        renditLojtaret();
-        shfaqStatsKlubi();
+
+        // Leximi i të dhënave nga Firebase në kohë reale
+        db.ref('lojtaret').on('value', snapshot => {
+            lojtaret = [];
+            snapshot.forEach(child => { lojtaret.push({id: child.key, ...child.val()}); });
+            renditLojtaret();
+        });
+
+        db.ref('ndeshjetLojtareve').on('value', snapshot => {
+            ndeshjetLojtareve = [];
+            snapshot.forEach(child => { ndeshjetLojtareve.push({id: child.key, ...child.val()}); });
+            if(lojtariAktual) filtroProfilin();
+        });
+
+        db.ref('ndeshjetKlubit').on('value', snapshot => {
+            ndeshjetKlubit = [];
+            snapshot.forEach(child => { ndeshjetKlubit.push({id: child.key, ...child.val()}); });
+            shfaqStatsKlubi();
+        });
     }
 
-    function synch() {
-        localStorage.setItem('ns_players_v10', JSON.stringify(lojtaret));
-        localStorage.setItem('ns_stats_v10', JSON.stringify(ndeshjetLojtareve));
-        localStorage.setItem('ns_club_v10', JSON.stringify(ndeshjetKlubit));
-        renditLojtaret();
-        shfaqStatsKlubi();
-    }
-
+    // --- FUNKSIONET E LOJTAREVE ---
     function regjistroLojtar() {
         let e = document.getElementById('regEmri').value.trim();
         if(!e) return;
-        lojtaret.push({ id: Date.now(), emri: e });
+        db.ref('lojtaret').push({ emri: e });
         document.getElementById('regEmri').value = "";
-        synch();
     }
 
     function renditLojtaret() {
@@ -202,13 +229,12 @@
         tab.innerHTML = "";
         lojtaret.sort((a,b)=>a.emri.localeCompare(b.emri)).forEach(l => {
             sel.innerHTML += `<option value="${l.emri}">${l.emri}</option>`;
-            tab.innerHTML += `<tr><td style="text-align:left; font-weight:600; cursor:pointer; color:var(--primary);" onclick="hapProfilin('${l.emri}')"><i class="fas fa-external-link-alt"></i> ${l.emri}</td><td><button onclick="fshijLojtar(${l.id})">🗑️</button></td></tr>`;
+            tab.innerHTML += `<tr><td style="text-align:left; font-weight:600; cursor:pointer; color:var(--primary);" onclick="hapProfilin('${l.emri}')"><i class="fas fa-external-link-alt"></i> ${l.emri}</td><td><button onclick="fshijLojtar('${l.id}', '${l.emri}')">🗑️</button></td></tr>`;
         });
     }
 
     function ruajStatLojtari() {
         let st = {
-            id: Date.now(),
             emri: document.getElementById('selLojtari').value,
             kat: document.getElementById('lKat').value,
             sez: document.getElementById('lSez').value,
@@ -219,13 +245,13 @@
             data: new Date().toLocaleDateString('sq-AL')
         };
         if(!st.emri || !st.kun) return alert("Plotëso fushat!");
-        ndeshjetLojtareve.push(st);
-        synch();
-        alert("U ruajt!");
+        db.ref('ndeshjetLojtareve').push(st);
+        alert("Statistikat u ruajtën!");
         document.getElementById('lKun').value = "";
         document.getElementById('lG').value = 0; document.getElementById('lA').value = 0; document.getElementById('lM').value = 0;
     }
 
+    // --- PROFILI DHE FILTRIMI ---
     function hapProfilin(emri) {
         lojtariAktual = emri;
         document.getElementById('tabLojtaret').style.display = "none";
@@ -240,34 +266,34 @@
         const body = document.getElementById('pHistory');
         body.innerHTML = "";
         let tg = 0, ta = 0, tm = 0;
-
         const ndeshjet = ndeshjetLojtareve.filter(n => n.emri === lojtariAktual && n.sez === sezoni);
-        
         ndeshjet.forEach(n => {
             tg += n.g; ta += n.a; tm += n.m;
-            body.innerHTML += `<tr><td>${n.data}</td><td>${n.kat}</td><td>${n.kun}</td><td>${n.g}</td><td>${n.a}</td><td>${n.m}</td><td><button onclick="fshijStatLojtari(${n.id})">X</button></td></tr>`;
+            body.innerHTML += `<tr><td>${n.data}</td><td>${n.kat}</td><td>${n.kun}</td><td>${n.g}</td><td>${n.a}</td><td>${n.m}</td><td><button onclick="fshijStatLojtari('${n.id}')">X</button></td></tr>`;
         });
-
         document.getElementById('pTotalG').innerText = tg;
         document.getElementById('pTotalA').innerText = ta;
         document.getElementById('pTotalM').innerText = tm;
     }
 
     function mbyllProfilin() {
+        lojtariAktual = "";
         document.getElementById('pProfile').style.display = "none";
         document.getElementById('mainNav').style.display = "flex";
         document.getElementById('tabLojtaret').style.display = "block";
     }
 
+    // --- NDESHJET E KLUBIT ---
     function ruajNdeshjeKlubi() {
         let nd = {
-            id: Date.now(), kat: document.getElementById('kKat').value,
-            sez: document.getElementById('kSez').value, data: document.getElementById('kData').value,
-            kun: document.getElementById('kKun').value, rez: document.getElementById('kRez').value
+            kat: document.getElementById('kKat').value,
+            sez: document.getElementById('kSez').value,
+            data: document.getElementById('kData').value,
+            kun: document.getElementById('kKun').value,
+            rez: document.getElementById('kRez').value
         };
         if(!nd.kun || !nd.data) return alert("Plotëso të dhënat!");
-        ndeshjetKlubit.push(nd);
-        synch();
+        db.ref('ndeshjetKlubit').push(nd);
         alert("Ndeshja u regjistrua!");
         document.getElementById('kKun').value = "";
     }
@@ -282,11 +308,22 @@
         filtrimi.sort((x,y)=> new Date(y.data) - new Date(x.data)).forEach(n => {
             if(n.rez === "Fitore") f++; else if(n.rez === "Barazim") b++; else h++;
             let klasi = n.rez === "Fitore" ? "win" : (n.rez === "Barazim" ? "draw" : "loss");
-            lista.innerHTML += `<tr><td>${n.data}</td><td><b>${n.kat}</b></td><td>vs ${n.kun}</td><td class="${klasi}">${n.rez}</td><td><button onclick="fshijNdeshjeKlubi(${n.id})">X</button></td></tr>`;
+            lista.innerHTML += `<tr><td>${n.data}</td><td><b>${n.kat}</b></td><td>vs ${n.kun}</td><td class="${klasi}">${n.rez}</td><td><button onclick="fshijNdeshjeKlubi('${n.id}')">X</button></td></tr>`;
         });
         document.getElementById('totalF').innerText = f;
         document.getElementById('totalB').innerText = b;
         document.getElementById('totalH').innerText = h;
+    }
+
+    // --- FSHIRJA DHE NAVIGIMI ---
+    function fshijNdeshjeKlubi(id) { if(confirm("Fshij ndeshjen?")) db.ref('ndeshjetKlubit').child(id).remove(); }
+    function fshijStatLojtari(id) { if(confirm("Fshij statistikën?")) db.ref('ndeshjetLojtareve').child(id).remove(); }
+    function fshijLojtar(id, emri) {
+        if(confirm(`A jeni i sigurt? Duke fshirë lojtarin ${emri}, do të fshihen edhe të gjitha statistikat e tij.`)) {
+            db.ref('lojtaret').child(id).remove();
+            // Fshi edhe statistikat e tij
+            ndeshjetLojtareve.filter(n => n.emri === emri).forEach(n => db.ref('ndeshjetLojtareve').child(n.id).remove());
+        }
     }
 
     function showTab(id) {
@@ -296,9 +333,6 @@
         event.currentTarget.classList.add('active');
     }
 
-    function fshijNdeshjeKlubi(id) { if(confirm("Fshij ndeshjen?")) { ndeshjetKlubit = ndeshjetKlubit.filter(n => n.id !== id); synch(); } }
-    function fshijStatLojtari(id) { if(confirm("Fshij statistikën?")) { ndeshjetLojtareve = ndeshjetLojtareve.filter(n => n.id !== id); synch(); filtroProfilin(); } }
-    function fshijLojtar(id) { if(confirm("Fshij lojtarin?")) { let l = lojtaret.find(x=>x.id===id); if(l) { ndeshjetLojtareve = ndeshjetLojtareve.filter(n=>n.emri !== l.emri); lojtaret = lojtaret.filter(x=>x.id!==id); synch(); } } }
     function kerkoLojtarin() {
         let v = document.getElementById('search').value.toLowerCase();
         let rows = document.getElementById('tabelaLojtareve').rows;
