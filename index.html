@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEW STARS - Pro Stats Kit</title>
+    <title>NEW STARS - Statistika</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -19,21 +19,33 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg-body); color: var(--text-dark); padding: 15px; }
+        
+        /* LOGIN */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary) 0%, #002244 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .login-box { background: white; padding: 40px; border-radius: var(--radius-lg); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); text-align: center; width: 90%; max-width: 400px; }
+        
+        /* HEADER & TABS */
         #appContent { display: none; max-width: 1200px; margin: 0 auto; }
         .app-header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; padding: 20px; border-radius: var(--radius-lg); text-align: center; margin-bottom: 20px; cursor: pointer; }
         .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { padding: 12px 20px; border-radius: 50px; border: none; background: #ddd; cursor: pointer; font-weight: 600; white-space: nowrap; }
         .tab-btn.active { background: var(--primary); color: white; }
+        
+        /* CARDS & TABLES */
         .main-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .stat-card { background: white; padding: 25px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-bottom: 20px; }
         label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: var(--primary); }
         input, select { width: 100%; padding: 14px; background: var(--input-bg); border: 2px solid transparent; border-radius: var(--radius-md); margin-bottom: 15px; font-family: inherit; }
-        .btn-submit { background: var(--primary); color: white; border: none; padding: 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; width: 100%; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-submit:hover { opacity: 0.9; }
+        
         .modern-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
         .modern-table th, .modern-table td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; font-size: 0.85rem; }
-        .win { color: #10b981; font-weight: 800; } .draw { color: #f59e0b; font-weight: 800; } .loss { color: #ef4444; font-weight: 800; }
+        .win { color: #10b981; font-weight: 800; } 
+        .draw { color: #f59e0b; font-weight: 800; } 
+        .loss { color: #ef4444; font-weight: 800; }
+        
+        .venue-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: bold; margin-left: 5px; }
         .total-box { background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; }
     </style>
 </head>
@@ -49,7 +61,9 @@
 </div>
 
 <div id="appContent">
-    <header class="app-header" onclick="location.reload()"><h1>NEW STARS <span>PRO</span></h1></header>
+    <header class="app-header" onclick="location.reload()">
+        <h1>NEW STARS <span>STATISTIKA</span></h1>
+    </header>
 
     <div id="mainNav" class="nav-tabs">
         <button class="tab-btn active" onclick="showTab('tabLojtaret')">Lojtarët</button>
@@ -90,23 +104,23 @@
     </div>
 
     <div id="tabKlubi" class="tab-content" style="display:none;">
-        <div class="stat-card">
+        <div class="stat-card" style="max-width: 600px; margin: 0 auto;">
             <h3><i class="fas fa-trophy"></i> Regjistro Ndeshjen e Shkollës</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <div><label>Kategoria</label><select id="kKat"><option value="">Zgjidh</option><option>U9</option><option>U11</option><option>U13</option><option>U15</option><option>U17</option><option>U19</option></select></div>
                 <div><label>Sezoni</label><select id="kSez" class="sezoni-select"></select></div>
             </div>
-            <label>Data</label>
-            <input type="date" id="kData">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div><label>Data</label><input type="date" id="kData"></div>
+                <div><label>Vendi (New Stars)</label><select id="kVendi"><option value="Vendas">Vendas (Brenda)</option><option value="Musafir">Musafir (Jashtë)</option></select></div>
+            </div>
             <label>Kundërshtari</label>
             <input type="text" id="kKun" placeholder="p.sh. KF Lepenci">
-            
-            <label>Rezultati i Ndeshjes</label>
+            <label>Rezultati Final</label>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <div><label>New Stars</label><input type="number" id="kGollatShenuar" placeholder="0"></div>
                 <div><label>Kundërshtari</label><input type="number" id="kGollatPranuar" placeholder="0"></div>
             </div>
-            
             <button class="btn-submit" onclick="ruajNdeshjeKlubi()">RUAJ NDESHJEN</button>
         </div>
     </div>
@@ -118,11 +132,24 @@
                 <div><label>Kategoria</label><select id="fKat" onchange="shfaqStatsKlubi()"><option value="Gjitha">Të gjitha</option><option>U9</option><option>U11</option><option>U13</option><option>U15</option><option>U17</option><option>U19</option></select></div>
                 <div><label>Sezoni</label><select id="fSez" class="sezoni-select" onchange="shfaqStatsKlubi()"></select></div>
             </div>
+            
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top:20px; text-align:center;">
                 <div style="background:#dcfce7; padding:15px; border-radius:10px;"><small>Fitore</small><h2 id="totalF" class="win">0</h2></div>
                 <div style="background:#fef3c7; padding:15px; border-radius:10px;"><small>Barazim</small><h2 id="totalB" class="draw">0</h2></div>
                 <div style="background:#fee2e2; padding:15px; border-radius:10px;"><small>Humbje</small><h2 id="totalH" class="loss">0</h2></div>
             </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px; text-align:center;">
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:10px;">
+                    <small>Vendas (F/B/H)</small>
+                    <p id="statsVendas" style="font-weight:700; color:var(--primary);">0F / 0B / 0H</p>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:10px;">
+                    <small>Musafir (F/B/H)</small>
+                    <p id="statsMusafir" style="font-weight:700; color:#64748b;">0F / 0B / 0H</p>
+                </div>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px; text-align:center;">
                 <div style="background:#e0f2fe; padding:10px; border-radius:10px;"><small>Golla të Shënuar</small><h3 id="statGShenuar">0</h3></div>
                 <div style="background:#f1f5f9; padding:10px; border-radius:10px;"><small>Golla të Pranuar</small><h3 id="statGPranuar">0</h3></div>
@@ -157,6 +184,7 @@
 </div>
 
 <script>
+    // FIREBASE CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyBh_7bwfNbKbscPSW1ZN9Y_UvAntsjl9Wg",
         authDomain: "herolind-6ca5f.firebaseapp.com",
@@ -180,10 +208,13 @@
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('appContent').style.display = "block";
             initApp();
+        } else {
+            alert("Fjalëkalimi i gabuar!");
         }
     }
 
     function initApp() {
+        // Mbush sezoneve (2024 - 2070)
         const selectsSezoni = document.querySelectorAll('.sezoni-select');
         let sezoneHTML = '<option value="">Zgjidh Sezonin</option>';
         for (let vit = 2024; vit <= 2070; vit++) {
@@ -193,6 +224,7 @@
         selectsSezoni.forEach(sel => sel.innerHTML = sezoneHTML);
         document.getElementById('kData').valueAsDate = new Date();
 
+        // Listeners nga Firebase
         db.ref('lojtaret').on('value', snapshot => {
             lojtaret = [];
             snapshot.forEach(child => { lojtaret.push({id: child.key, ...child.val()}); });
@@ -214,7 +246,7 @@
 
     function regjistroLojtar() {
         let e = document.getElementById('regEmri').value.trim();
-        if(!e) return alert("Gabim: Shënoni emrin e lojtarit!");
+        if(!e) return alert("Shënoni emrin!");
         db.ref('lojtaret').push({ emri: e });
         document.getElementById('regEmri').value = "";
     }
@@ -239,17 +271,13 @@
         let a = document.getElementById('lA').value;
         let m = document.getElementById('lM').value;
         
-        if(!emri || !kat || !sez || !kun || g === "" || a === "" || m === "") {
-            return alert("KUJDES: Duhet të plotësoni çdo rubrikë!");
-        }
+        if(!emri || !kat || !sez || !kun || g === "" || a === "" || m === "") return alert("Plotësoni të gjitha!");
 
-        let st = {
-            emri: emri, kat: kat, sez: sez, kun: kun,
+        db.ref('ndeshjetLojtareve').push({
+            emri, kat, sez, kun,
             g: parseInt(g), a: parseInt(a), m: parseInt(m),
             data: new Date().toLocaleDateString('sq-AL')
-        };
-
-        db.ref('ndeshjetLojtareve').push(st);
+        });
         alert("Statistikat u ruajtën!");
         document.getElementById('lKun').value = "";
         document.getElementById('lG').value = ""; document.getElementById('lA').value = ""; document.getElementById('lM').value = "";
@@ -259,32 +287,85 @@
         let kat = document.getElementById('kKat').value;
         let sez = document.getElementById('kSez').value;
         let data = document.getElementById('kData').value;
+        let vendi = document.getElementById('kVendi').value;
         let kun = document.getElementById('kKun').value.trim();
-        let gShenuar = document.getElementById('kGollatShenuar').value;
-        let gPranuar = document.getElementById('kGollatPranuar').value;
+        let s1 = parseInt(document.getElementById('kGollatShenuar').value);
+        let s2 = parseInt(document.getElementById('kGollatPranuar').value);
 
-        if(!kat || !sez || !data || !kun || gShenuar === "" || gPranuar === "") {
-            return alert("GABIM: Plotësoni të gjitha rubrikat!");
-        }
+        if(!kat || !sez || !data || !kun || isNaN(s1) || isNaN(s2)) return alert("Plotësoni të gjitha fushave!");
 
-        // Llogarit rezultatin automatikisht
-        let rez = "";
-        let s1 = parseInt(gShenuar);
-        let s2 = parseInt(gPranuar);
-        if(s1 > s2) rez = "Fitore";
-        else if(s1 === s2) rez = "Barazim";
-        else rez = "Humbje";
+        let rez = s1 > s2 ? "Fitore" : (s1 === s2 ? "Barazim" : "Humbje");
 
         db.ref('ndeshjetKlubit').push({ 
-            kat, sez, data, kun, rez, 
-            gShenuar: s1, 
-            gPranuar: s2 
+            kat, sez, data, kun, rez, vendi,
+            gShenuar: s1, gPranuar: s2 
         });
-
-        alert("Ndeshja u regjistrua me rezultat " + s1 + ":" + s2);
+        alert("Ndeshja u regjistrua!");
         document.getElementById('kKun').value = "";
         document.getElementById('kGollatShenuar').value = "";
         document.getElementById('kGollatPranuar').value = "";
+    }
+
+    function shfaqStatsKlubi() {
+        const kat = document.getElementById('fKat').value;
+        const sez = document.getElementById('fSez').value;
+        const lista = document.getElementById('listaNdeshjeveKlubi');
+        lista.innerHTML = "";
+        
+        let f = 0, b = 0, h = 0;
+        let vf = 0, vb = 0, vh = 0; // Stats Vendas
+        let mf = 0, mb = 0, mh = 0; // Stats Musafir
+        let totGS = 0, totGP = 0;
+
+        let filtrimi = ndeshjetKlubit.filter(n => (kat === "Gjitha" || n.kat === kat) && n.sez === sez);
+        
+        filtrimi.sort((x,y)=> new Date(y.data) - new Date(x.data)).forEach(n => {
+            // Totals
+            if(n.rez === "Fitore") f++; else if(n.rez === "Barazim") b++; else h++;
+            
+            // Ndarja Vendas vs Musafir
+            if(n.vendi === "Vendas") {
+                if(n.rez === "Fitore") vf++; else if(n.rez === "Barazim") vb++; else vh++;
+            } else {
+                if(n.rez === "Fitore") mf++; else if(n.rez === "Barazim") mb++; else mh++;
+            }
+
+            totGS += (n.gShenuar || 0);
+            totGP += (n.gPranuar || 0);
+
+            let klasi = n.rez === "Fitore" ? "win" : (n.rez === "Barazim" ? "draw" : "loss");
+            let vTag = n.vendi === "Vendas" ? "V" : "M";
+
+            lista.innerHTML += `<tr>
+                <td>${n.data}</td>
+                <td><b>${n.kat}</b></td>
+                <td>vs ${n.kun} <span class="venue-badge">${vTag}</span></td>
+                <td class="${klasi}">${n.gShenuar}:${n.gPranuar}</td>
+                <td><button onclick="fshijNdeshjeKlubi('${n.id}')">X</button></td>
+            </tr>`;
+        });
+
+        document.getElementById('totalF').innerText = f;
+        document.getElementById('totalB').innerText = b;
+        document.getElementById('totalH').innerText = h;
+        document.getElementById('statsVendas').innerText = `${vf}F / ${vb}B / ${vh}H`;
+        document.getElementById('statsMusafir').innerText = `${mf}F / ${mb}B / ${mh}H`;
+        document.getElementById('statGShenuar').innerText = totGS;
+        document.getElementById('statGPranuar').innerText = totGP;
+    }
+
+    // NDIHMËSE
+    function showTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = "none");
+        document.getElementById(id).style.display = "block";
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        if(event) event.currentTarget.classList.add('active');
+    }
+
+    function kerkoLojtarin() {
+        let v = document.getElementById('search').value.toLowerCase();
+        let rows = document.getElementById('tabelaLojtareve').rows;
+        for(let i=0; i<rows.length; i++) rows[i].style.display = rows[i].innerText.toLowerCase().includes(v) ? "" : "none";
     }
 
     function hapProfilin(emri) {
@@ -296,21 +377,6 @@
         filtroProfilin();
     }
 
-    function filtroProfilin() {
-        const sezoni = document.getElementById('pSezFiltri').value;
-        const body = document.getElementById('pHistory');
-        body.innerHTML = "";
-        let tg = 0, ta = 0, tm = 0;
-        const ndeshjet = ndeshjetLojtareve.filter(n => n.emri === lojtariAktual && n.sez === sezoni);
-        ndeshjet.forEach(n => {
-            tg += n.g; ta += n.a; tm += n.m;
-            body.innerHTML += `<tr><td>${n.data}</td><td>${n.kat}</td><td>${n.kun}</td><td>${n.g}</td><td>${n.a}</td><td>${n.m}</td><td><button onclick="fshijStatLojtari('${n.id}')">X</button></td></tr>`;
-        });
-        document.getElementById('pTotalG').innerText = tg;
-        document.getElementById('pTotalA').innerText = ta;
-        document.getElementById('pTotalM').innerText = tm;
-    }
-
     function mbyllProfilin() {
         lojtariAktual = "";
         document.getElementById('pProfile').style.display = "none";
@@ -318,62 +384,27 @@
         document.getElementById('tabLojtaret').style.display = "block";
     }
 
-    function shfaqStatsKlubi() {
-        const kat = document.getElementById('fKat').value;
-        const sez = document.getElementById('fSez').value;
-        const lista = document.getElementById('listaNdeshjeveKlubi');
-        lista.innerHTML = "";
-        
-        let f = 0, b = 0, h = 0;
-        let totGShenuar = 0, totGPranuar = 0;
-
-        let filtrimi = ndeshjetKlubit.filter(n => (kat === "Gjitha" || n.kat === kat) && n.sez === sez);
-        
-        filtrimi.sort((x,y)=> new Date(y.data) - new Date(x.data)).forEach(n => {
-            // Llogarit statistikat
-            if(n.rez === "Fitore") f++; else if(n.rez === "Barazim") b++; else h++;
-            totGShenuar += (n.gShenuar || 0);
-            totGPranuar += (n.gPranuar || 0);
-
-            let klasi = n.rez === "Fitore" ? "win" : (n.rez === "Barazim" ? "draw" : "loss");
-            let rezultatText = n.gShenuar !== undefined ? `${n.gShenuar}:${n.gPranuar}` : n.rez;
-
-            lista.innerHTML += `<tr>
-                <td>${n.data}</td>
-                <td><b>${n.kat}</b></td>
-                <td>vs ${n.kun}</td>
-                <td class="${klasi}">${rezultatText}</td>
-                <td><button onclick="fshijNdeshjeKlubi('${n.id}')">X</button></td>
-            </tr>`;
+    function filtroProfilin() {
+        const sez = document.getElementById('pSezFiltri').value;
+        const body = document.getElementById('pHistory');
+        body.innerHTML = "";
+        let g=0, a=0, m=0;
+        ndeshjetLojtareve.filter(n => n.emri === lojtariAktual && n.sez === sez).forEach(n => {
+            g+=n.g; a+=n.a; m+=n.m;
+            body.innerHTML += `<tr><td>${n.data}</td><td>${n.kat}</td><td>${n.kun}</td><td>${n.g}</td><td>${n.a}</td><td>${n.m}</td><td><button onclick="fshijStatLojtari('${n.id}')">X</button></td></tr>`;
         });
-
-        document.getElementById('totalF').innerText = f;
-        document.getElementById('totalB').innerText = b;
-        document.getElementById('totalH').innerText = h;
-        document.getElementById('statGShenuar').innerText = totGShenuar;
-        document.getElementById('statGPranuar').innerText = totGPranuar;
+        document.getElementById('pTotalG').innerText = g;
+        document.getElementById('pTotalA').innerText = a;
+        document.getElementById('pTotalM').innerText = m;
     }
 
     function fshijNdeshjeKlubi(id) { if(confirm("Fshij ndeshjen?")) db.ref('ndeshjetKlubit').child(id).remove(); }
-    function fshijStatLojtari(id) { if(confirm("Fshij statistikën?")) db.ref('ndeshjetLojtareve').child(id).remove(); }
+    function fshijStatLojtari(id) { if(confirm("Fshij?")) db.ref('ndeshjetLojtareve').child(id).remove(); }
     function fshijLojtar(id, emri) {
-        if(confirm(`Sigurt? Do të fshihen edhe të gjitha statistikat për ${emri}.`)) {
+        if(confirm(`Fshij lojtarin ${emri} dhe të gjitha stats?`)) {
             db.ref('lojtaret').child(id).remove();
             ndeshjetLojtareve.filter(n => n.emri === emri).forEach(n => db.ref('ndeshjetLojtareve').child(n.id).remove());
         }
-    }
-
-    function showTab(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display = "none");
-        document.getElementById(id).style.display = "block";
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        if(event && event.currentTarget.classList) event.currentTarget.classList.add('active');
-    }
-
-    function kerkoLojtarin() {
-        let v = document.getElementById('search').value.toLowerCase();
-        let rows = document.getElementById('tabelaLojtareve').rows;
-        for(let i=0; i<rows.length; i++) rows[i].style.display = rows[i].innerText.toLowerCase().includes(v) ? "" : "none";
     }
 </script>
 </body>
