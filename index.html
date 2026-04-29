@@ -100,13 +100,13 @@
             <input type="date" id="kData">
             <label>Kundërshtari</label>
             <input type="text" id="kKun" placeholder="p.sh. KF Lepenci">
-            <label>Rezultati (New Stars)</label>
-            <select id="kRez">
-                <option value="">Zgjidh rezultatin</option>
-                <option value="Fitore">Fitore</option>
-                <option value="Barazim">Barazim</option>
-                <option value="Humbje">Humbje</option>
-            </select>
+            
+            <label>Rezultati i Ndeshjes</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div><label>New Stars</label><input type="number" id="kGollatShenuar" placeholder="0"></div>
+                <div><label>Kundërshtari</label><input type="number" id="kGollatPranuar" placeholder="0"></div>
+            </div>
+            
             <button class="btn-submit" onclick="ruajNdeshjeKlubi()">RUAJ NDESHJEN</button>
         </div>
     </div>
@@ -123,8 +123,13 @@
                 <div style="background:#fef3c7; padding:15px; border-radius:10px;"><small>Barazim</small><h2 id="totalB" class="draw">0</h2></div>
                 <div style="background:#fee2e2; padding:15px; border-radius:10px;"><small>Humbje</small><h2 id="totalH" class="loss">0</h2></div>
             </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px; text-align:center;">
+                <div style="background:#e0f2fe; padding:10px; border-radius:10px;"><small>Golla të Shënuar</small><h3 id="statGShenuar">0</h3></div>
+                <div style="background:#f1f5f9; padding:10px; border-radius:10px;"><small>Golla të Pranuar</small><h3 id="statGPranuar">0</h3></div>
+            </div>
+
             <table class="modern-table">
-                <thead><tr><th>Data</th><th>Kat.</th><th>Kundërshtari</th><th>Rezultati</th><th>Fshi</th></tr></thead>
+                <thead><tr><th>Data</th><th>Kat.</th><th>Ndeshja</th><th>Rezultati</th><th>Fshi</th></tr></thead>
                 <tbody id="listaNdeshjeveKlubi"></tbody>
             </table>
         </div>
@@ -234,9 +239,8 @@
         let a = document.getElementById('lA').value;
         let m = document.getElementById('lM').value;
         
-        // KONTROLLI I RREPTË: Të gjitha fushat duhet të jenë të plotësuara
         if(!emri || !kat || !sez || !kun || g === "" || a === "" || m === "") {
-            return alert("KUJDES: Duhet të plotësoni çdo rubrikë!\n\n(Nëse nuk ka bërë gola/asistime, shënoni numrin 0)");
+            return alert("KUJDES: Duhet të plotësoni çdo rubrikë!");
         }
 
         let st = {
@@ -256,15 +260,31 @@
         let sez = document.getElementById('kSez').value;
         let data = document.getElementById('kData').value;
         let kun = document.getElementById('kKun').value.trim();
-        let rez = document.getElementById('kRez').value;
+        let gShenuar = document.getElementById('kGollatShenuar').value;
+        let gPranuar = document.getElementById('kGollatPranuar').value;
 
-        if(!kat || !sez || !data || !kun || !rez) {
-            return alert("GABIM: Plotësoni të gjitha rubrikat e ndeshjes (Kategorinë, Sezonin, Datën, Kundërshtarin dhe Rezultatin)!");
+        if(!kat || !sez || !data || !kun || gShenuar === "" || gPranuar === "") {
+            return alert("GABIM: Plotësoni të gjitha rubrikat!");
         }
 
-        db.ref('ndeshjetKlubit').push({ kat, sez, data, kun, rez });
-        alert("Ndeshja e shkollës u regjistrua!");
+        // Llogarit rezultatin automatikisht
+        let rez = "";
+        let s1 = parseInt(gShenuar);
+        let s2 = parseInt(gPranuar);
+        if(s1 > s2) rez = "Fitore";
+        else if(s1 === s2) rez = "Barazim";
+        else rez = "Humbje";
+
+        db.ref('ndeshjetKlubit').push({ 
+            kat, sez, data, kun, rez, 
+            gShenuar: s1, 
+            gPranuar: s2 
+        });
+
+        alert("Ndeshja u regjistrua me rezultat " + s1 + ":" + s2);
         document.getElementById('kKun').value = "";
+        document.getElementById('kGollatShenuar').value = "";
+        document.getElementById('kGollatPranuar').value = "";
     }
 
     function hapProfilin(emri) {
@@ -303,16 +323,35 @@
         const sez = document.getElementById('fSez').value;
         const lista = document.getElementById('listaNdeshjeveKlubi');
         lista.innerHTML = "";
+        
         let f = 0, b = 0, h = 0;
+        let totGShenuar = 0, totGPranuar = 0;
+
         let filtrimi = ndeshjetKlubit.filter(n => (kat === "Gjitha" || n.kat === kat) && n.sez === sez);
+        
         filtrimi.sort((x,y)=> new Date(y.data) - new Date(x.data)).forEach(n => {
+            // Llogarit statistikat
             if(n.rez === "Fitore") f++; else if(n.rez === "Barazim") b++; else h++;
+            totGShenuar += (n.gShenuar || 0);
+            totGPranuar += (n.gPranuar || 0);
+
             let klasi = n.rez === "Fitore" ? "win" : (n.rez === "Barazim" ? "draw" : "loss");
-            lista.innerHTML += `<tr><td>${n.data}</td><td><b>${n.kat}</b></td><td>vs ${n.kun}</td><td class="${klasi}">${n.rez}</td><td><button onclick="fshijNdeshjeKlubi('${n.id}')">X</button></td></tr>`;
+            let rezultatText = n.gShenuar !== undefined ? `${n.gShenuar}:${n.gPranuar}` : n.rez;
+
+            lista.innerHTML += `<tr>
+                <td>${n.data}</td>
+                <td><b>${n.kat}</b></td>
+                <td>vs ${n.kun}</td>
+                <td class="${klasi}">${rezultatText}</td>
+                <td><button onclick="fshijNdeshjeKlubi('${n.id}')">X</button></td>
+            </tr>`;
         });
+
         document.getElementById('totalF').innerText = f;
         document.getElementById('totalB').innerText = b;
         document.getElementById('totalH').innerText = h;
+        document.getElementById('statGShenuar').innerText = totGShenuar;
+        document.getElementById('statGPranuar').innerText = totGPranuar;
     }
 
     function fshijNdeshjeKlubi(id) { if(confirm("Fshij ndeshjen?")) db.ref('ndeshjetKlubit').child(id).remove(); }
@@ -328,7 +367,7 @@
         document.querySelectorAll('.tab-content').forEach(t => t.style.display = "none");
         document.getElementById(id).style.display = "block";
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        if(event) event.currentTarget.classList.add('active');
+        if(event && event.currentTarget.classList) event.currentTarget.classList.add('active');
     }
 
     function kerkoLojtarin() {
